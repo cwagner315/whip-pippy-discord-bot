@@ -3,8 +3,6 @@ import os
 
 import random
 import discord
-from discord.ext import tasks
-from datetime import date, datetime
 from dotenv import load_dotenv
 
 load_dotenv()
