@@ -79,7 +79,40 @@ jokeList = [
 	('How do you embarrass an archaeologist? Give him a used tampon and ask him which period it came from.'), 
 	('What does the receptionist at a sperm bank say as clients leave? "Thanks for coming!"'), 
 	('What do you call a smiling Roman soldier with a piece of hair stuck between his front teeth? A glad-he-ate-her.'), 
-	('What\'s long and hard and full of semen? A submarine!')
+	('What\'s long and hard and full of semen? A submarine!'),
+    ('What did the clitoris say to the vulva?“It\'s all good in the hood!”'), 
+	('My girlfriend asked me if I smoke after sex…I said I haven\'t looked.'), 
+	('What do you call a person who doesn\'t masturbate?A liar.'), 
+	('A worm crawls out of a pile of spaghetti…It says, “Damn, that was one hell of an orgy!”'), 
+	('Sex is like a burrito…Don\'t unwrap or that baby\'s in your lap.'), 
+	('A guy is sitting at the doctor\'s office.The doctor walks in and says, “I have some bad news. I\'m afraid you\'re going to have to stop masturbating.”“I don\'t understand, doc,” the patient says. “Why?”“Because,” the doctor says. “I\'m trying to examine you.”'), 
+	('What\'s the difference between a G-spot and a clitoris?Men don\'t care.'), 
+	('What are the three shortest words in the English language?Is it in?'), 
+	('What does the sign on an out-of-business brothel say?“Beat it. We\'re closed!”'), 
+	('Why does Dr. Pepper come in a bottle?Because his wife has passed away.'), 
+	('Beer Bottle: “You break me, you get one year of bad luck!”Mirror: “You kiddin\' me? You break me, then y\'all get seven years of bad luck!”Condom: “Hahaha… (Condom walks off laughing)”'), 
+	('What do you call a herd of cows masturbating?Beef strokin\' off!'), 
+	('What\'s the difference between your penis and a bonus check?Someone\'s always willing to blow your bonus.'), 
+	('What did the guy say when he got caught masturbating to an optical illusion?“It\'s not what it looks like!”'), 
+	('Knock, knock.Who\'s there?Not someone.Not someone who?Not someone who will get you laid.'), 
+	('How did you quit smoking?I decided to smoke only after sex.'), 
+	('Do you want to hear a joke about my vagina?Never mind. You\'ll never get it!'), 
+	('What did the banana say to the vibrator?“Why are you shaking? She\'s going to eat me!”'), 
+	('Why is masturbation just like procrastination?It\'s all good until you realize you\'re only screwing yourself.'), 
+	('Knock, knock.Who\'s there?Dewey!Dewey who?Dewey see a condom? It\'s dark in here!'), 
+	('What\'s the difference between a tire and 365 used condoms?Ones a Goodyear. The other is a great year.'), 
+	('The other day I was so frustrated I yelled out, “Fuck my life.”The neighbor heard, “Fuck my wife.”'), 
+	('What\'s the difference between a G-spot and a golf ball?A man will actually search for a golf ball.'), 
+	('What did the penis say to the vagina?“Don\'t make me cum in there!”'), 
+	('Why did the dick go crazy?Someone was messing with his head.'), 
+	('What\'s another name for a diaphragm?A trampoline for dicks.'), 
+	('What does Popeye use as a lubricant?Olive Oyl.'), 
+	('Why is Santa\'s sack so big?He only comes once a year.'), 
+	('What\'s better than pansies on a piano?Tulips on your organ!'), 
+	('What did the penis say to the condom?“Cover me, I\'m going in.”'), 
+	('What did Adam say to Eve?“Stand back. I don\'t know how big this thing\'s gonna grow.”'), 
+	('What do a penis and a Rubik\'s Cube have in common?The more you play with it, the harder it gets.'), 
+	('What\'s the one difference between a pregnant woman and a lightbulb?You can unscrew the lightbulb.')
 ]
 
 intents = discord.Intents.default()
@@ -93,7 +126,7 @@ async def on_message(message):
         return
 
     if message.content == '!dirtyjoke':
-        dirtyJokeId = random.randint(0, 67)
+        dirtyJokeId = random.randint(0, len(jokeList)-1)
 
         response = f'|| {jokeList[dirtyJokeId]} || {message.author.mention}'
         await message.channel.send(response)
