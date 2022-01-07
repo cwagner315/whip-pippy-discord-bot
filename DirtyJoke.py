@@ -1,9 +1,11 @@
 # DirtyJoke.py
+# executable="C:/ffmpeg/bin/ffmpeg.exe", <-- for winows machines..
 import os
 import time
 import random
 import discord
 import pyttsx3
+from gtts import gTTS
 import asyncio
 from dotenv import load_dotenv
 from discord.ext.commands import Bot
@@ -145,18 +147,31 @@ async def testTTS(ctx):
 			
 		engine.runAndWait()
 
-# @bot.command(pass_context = True)
-# async def moan(ctx):
-# 	if (ctx.author.voice):
-# 		channel = ctx.author.voice.channel
-# 		vc = await channel.connect()
-# 		vc.play(discord.FFmpegPCMAudio(executable="C:/ffmpeg/bin/ffmpeg.exe", source="TTS_Files/Moan.mp3"))
+@bot.command(pass_context = True)
+async def moan(ctx):
+	if (ctx.author.voice):
+		channel = ctx.author.voice.channel
+		vc = await channel.connect()
+		vc.play(discord.FFmpegPCMAudio(source="TTS_Files/Moan.mp3"))
+		
+		while vc.is_playing():
+			print("playing...")
+			 
+		await asyncio.sleep(2)
+		await ctx.guild.voice_client.disconnect()
 
-# 		while vc.is_playing():
-# 			print("playing...")
-
-# 		await asyncio.sleep(3)
-# 		await ctx.guild.voice_client.disconnect()
+@bot.command(pass_context = True)
+async def ofcourse(ctx):
+	if (ctx.author.voice):
+		channel = ctx.author.voice.channel
+		vc = await channel.connect()
+		vc.play(discord.FFmpegPCMAudio(source="TTS_Files/OneMillionPercent.mp3"))
+		
+		while vc.is_playing():
+			print("playing...")
+			 
+		await asyncio.sleep(2)
+		await ctx.guild.voice_client.disconnect()
 
 @bot.command(pass_context = True)
 async def dirtyjoke(ctx):
@@ -170,14 +185,17 @@ async def dirtyjoke(ctx):
         vc = await channel.connect()
 
         mp3filename = f"TTS_Files/{ctx.author.name}-{time.time()}.mp3"
-        engine = pyttsx3.init()
+        
+		#engine = pyttsx3.init()
         #voices = engine.getProperty('voices')
-        #engine.setProperty('voice', voices[2].id)
-        engine. setProperty("rate", 140)
-        engine.save_to_file(jokeList[dirtyJokeId], mp3filename)
-        engine.runAndWait()
+        #engine.setProperty('voice', voices[17].id)
+        #engine. setProperty("rate", 140)
+        #engine.save_to_file(jokeList[dirtyJokeId], mp3filename)
+        #engine.runAndWait()
+        tts = gTTS(jokeList[dirtyJokeId], lang='en', tld='co.in')
+        tts.save(mp3filename)
 
-        vc.play(discord.FFmpegPCMAudio(executable="C:/ffmpeg/bin/ffmpeg.exe", source=mp3filename))
+        vc.play(discord.FFmpegPCMAudio(source=mp3filename))
 
         while vc.is_playing():
             print("playing...")
