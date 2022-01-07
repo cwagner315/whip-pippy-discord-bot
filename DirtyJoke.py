@@ -1,9 +1,12 @@
 # DirtyJoke.py
 import os
-
+import time
 import random
 import discord
+import pyttsx3
+import asyncio
 from dotenv import load_dotenv
+from discord.ext.commands import Bot
 
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
@@ -28,7 +31,7 @@ jokeList = [
 	('Why does a mermaid wear seashells? Because she outgrew her B-shells!'), 
 	('What do you call a cheap circumcision? A rip-off!'), 
 	('What do you do when your cat\'s dead? Play with the neighbor\'s pussy instead.'), 
-	('How is life like toilet paper? You\'re either on a roll or taking s*** from someone.'), 
+	('How is life like toilet paper? You\'re either on a roll or taking shit from someone.'), 
 	('What\'s the difference between a tire and 365 used condoms? One\'s a Goodyear. The other\'s a great year.'), 
 	('What is Moby Dick\'s dad\'s name? Papa Boner.'), 
 	('What do you call someone who refuses to fart in public? A private tutor!'), 
@@ -113,20 +116,73 @@ jokeList = [
 	('What\'s the one difference between a pregnant woman and a lightbulb?You can unscrew the lightbulb.')
 ]
 
-intents = discord.Intents.default()
-intents.members = True
-client = discord.Client(intents=intents)
+bot = Bot("!")
 
-@client.event
-async def on_message(message):
-    global jokeList
-    if message.author == client.user:
-        return
+@bot.command(pass_context = True)
+async def join(ctx):
+	if (ctx.author.voice):
+		channel = ctx.author.voice.channel
+		await channel.connect()
+	else:
+		await ctx.send("You aren't in a voice channel.. otherwise I'd of said it.. bitch")
 
-    if message.content == '!dirtyjoke':
-        dirtyJokeId = random.randint(0, len(jokeList)-1)
+@bot.command(pass_context = True)
+async def leave(ctx):
+	if (ctx.voice_client):
+		await ctx.guild.voice_client.disconnect()
+		await ctx.send("I left the voice channel")
 
-        response = f'|| {jokeList[dirtyJokeId]} || {message.author.mention}'
-        await message.channel.send(response)
+@bot.command(pass_context = True)
+async def testTTS(ctx):
+	if (ctx.author.voice):
+		engine = pyttsx3.init()
+		voices = engine.getProperty('voices')
+		index = 0
+		
+		for voice in voices:
+			print(f'index-> {index} -- {voice.name}')
+			index +=1
+			
+		engine.runAndWait()
 
-client.run(TOKEN)
+# @bot.command(pass_context = True)
+# async def moan(ctx):
+# 	if (ctx.author.voice):
+# 		channel = ctx.author.voice.channel
+# 		vc = await channel.connect()
+# 		vc.play(discord.FFmpegPCMAudio(executable="C:/ffmpeg/bin/ffmpeg.exe", source="TTS_Files/Moan.mp3"))
+
+# 		while vc.is_playing():
+# 			print("playing...")
+
+# 		await asyncio.sleep(3)
+# 		await ctx.guild.voice_client.disconnect()
+
+@bot.command(pass_context = True)
+async def dirtyjoke(ctx):
+    dirtyJokeId = random.randint(0, len(jokeList)-1)
+
+    response = f'|| {jokeList[dirtyJokeId]} || {ctx.author.mention}'
+    await ctx.send(response)
+
+    if (ctx.author.voice):
+        channel = ctx.author.voice.channel
+        vc = await channel.connect()
+
+        mp3filename = f"TTS_Files/{ctx.author.name}-{time.time()}.mp3"
+        engine = pyttsx3.init()
+        #voices = engine.getProperty('voices')
+        #engine.setProperty('voice', voices[2].id)
+        engine. setProperty("rate", 140)
+        engine.save_to_file(jokeList[dirtyJokeId], mp3filename)
+        engine.runAndWait()
+
+        vc.play(discord.FFmpegPCMAudio(executable="C:/ffmpeg/bin/ffmpeg.exe", source=mp3filename))
+
+        while vc.is_playing():
+            print("playing...")
+
+        await asyncio.sleep(3)
+        await ctx.guild.voice_client.disconnect()
+
+bot.run(TOKEN)
