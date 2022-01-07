@@ -174,6 +174,19 @@ async def ofcourse(ctx):
 		await ctx.guild.voice_client.disconnect()
 
 @bot.command(pass_context = True)
+async def smaller(ctx):
+	if (ctx.author.voice):
+		channel = ctx.author.voice.channel
+		vc = await channel.connect()
+		vc.play(discord.FFmpegPCMAudio(source="TTS_Files/Smaller.mp3"))
+		
+		while vc.is_playing():
+			print("playing...")
+			 
+		await asyncio.sleep(2)
+		await ctx.guild.voice_client.disconnect()
+
+@bot.command(pass_context = True)
 async def dirtyjoke(ctx):
     dirtyJokeId = random.randint(0, len(jokeList)-1)
 
