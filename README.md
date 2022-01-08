@@ -24,6 +24,6 @@ seconds between 15-120.
 
 Command use: !lap Optional[target] to start a vote.
 
-ex: 
-        !lap @pipe_down
-        !lap # Defaults: @pipe_down
+ex:
+	!lap @pipe_down
+	!lap # Defaults: @pipe_down
