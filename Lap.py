@@ -20,9 +20,10 @@ targetMember = None
 acussingMember = None
 voteIds = []
 voteActive = False
-voteChannelId = ''
+voteChannel = None
 voteUserId = ''
 voteStartTime = datetime.now()
+votesRequired = 5
 
 muteActive = False
 muteTime = 0
@@ -32,7 +33,7 @@ bot = Bot("!")
 
 @tasks.loop(seconds = 1) # repeat after every 1 seconds
 async def countdownLoop():
-    global voteIds, voteActive, voteStartTime, voteChannelId, voteUserId, muteActive, muteStartTime, muteTime
+    global voteIds, voteActive, voteStartTime, voteChannel, voteUserId, muteActive, muteStartTime, muteTime
     
     await bot.wait_until_ready()
     
@@ -40,7 +41,7 @@ async def countdownLoop():
         if guild.name == GUILD:
             break
 
-    channel = bot.get_channel(id=voteChannelId)
+    channel = voteChannel
         
     timeDelta = (datetime.now() - voteStartTime)
     timeDelta = math.floor(timeDelta.total_seconds())
@@ -66,9 +67,9 @@ async def countdownLoop():
             await set_to_unmuted(targetMember)
 
 
-@bot.command()
+@bot.command(help = 'Intiates a one minute vote for (3/5) of the target members current voice channel non-self-defeaned members to cast a vote by typing !lap\rif the mute is successful it will server mute the target user for a random amount of seconds between 15-120.\nCommand use: !lap Optional[target] to start a vote.\r\rex: \r\t!lap @pipe_down\r\t!lap # Defaults: @pipe_down\r')
 async def lap(ctx, target : Optional[discord.Member] = None):
-    global voteIds, voteActive, voteChannelId, voteStartTime, muteStartTime, muteTime, muteActive, targetMember, acussingMember
+    global voteIds, voteActive, voteChannel, voteStartTime, votesRequired, muteStartTime, muteTime, muteActive, targetMember, acussingMember
     
     if not muteActive:
         if not voteActive:
@@ -87,15 +88,25 @@ async def lap(ctx, target : Optional[discord.Member] = None):
             voteIds.insert(len(voteIds), ctx.author.id)
 
             if len(voteIds) == 1:
-                response = f'{ctx.author.mention} has intiated a vote to mute {target.mention}! "!lap" to vote ({len(voteIds)} / 5)'
+                voiceMembers = target.voice.channel.members
+                if voiceMembers:
+                    votesRequired = 0
+                    for member in voiceMembers:
+                        if not member.voice.self_deaf:
+                            votesRequired = votesRequired + 1
+                            print(f"Votes Required: {votesRequired}")
+
+                votesRequired = math.floor(votesRequired * (3 / 5))
+                votesRequired = votesRequired and (votesRequired >= 2) or 2 
+                response = f'{ctx.author.mention} has intiated a vote to mute {target.mention}! "!lap" to vote ({len(voteIds)} / {votesRequired})'
                 voteActive = True
                 voteStartTime = datetime.now()
-                voteChannelId = ctx.channel.id 
-            elif len(voteIds) == 2:
+                voteChannel = ctx.channel
+            elif len(voteIds) >= votesRequired:
                 muteTime = random.randint(15, 120)
                 muteStartTime = datetime.now()
                 muteActive = True
-                response = f'{ctx.author.mention} put the final nail in the coffin! ({len(voteIds)} / 5)\n{target.mention} will be muted for {muteTime} seconds!'
+                response = f'{ctx.author.mention} put the final nail in the coffin! ({len(voteIds)} / {votesRequired})\n{target.mention} will be muted for {muteTime} seconds!'
                 voteIds = []
                 voteActive = False
                 await set_to_muted(target)
