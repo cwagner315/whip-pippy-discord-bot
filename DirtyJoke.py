@@ -174,6 +174,32 @@ async def ofcourse(ctx):
 		await ctx.guild.voice_client.disconnect()
 
 @bot.command(pass_context = True)
+async def tip(ctx):
+	if (ctx.author.voice):
+		channel = ctx.author.voice.channel
+		vc = await channel.connect()
+		vc.play(discord.FFmpegPCMAudio(source="TTS_Files/Tip.mp3"))
+		
+		while vc.is_playing():
+			print("playing...")
+			 
+		await asyncio.sleep(2)
+		await ctx.guild.voice_client.disconnect()
+
+@bot.command(pass_context = True)
+async def nightroast(ctx):
+	if (ctx.author.voice):
+		channel = ctx.author.voice.channel
+		vc = await channel.connect()
+		vc.play(discord.FFmpegPCMAudio(source="TTS_Files/NightRoast.mp3"))
+		
+		while vc.is_playing():
+			print("playing...")
+			 
+		await asyncio.sleep(2)
+		await ctx.guild.voice_client.disconnect()
+
+@bot.command(pass_context = True)
 async def smaller(ctx):
 	if (ctx.author.voice):
 		channel = ctx.author.voice.channel
@@ -205,7 +231,7 @@ async def dirtyjoke(ctx):
         #engine. setProperty("rate", 140)
         #engine.save_to_file(jokeList[dirtyJokeId], mp3filename)
         #engine.runAndWait()
-        tts = gTTS(jokeList[dirtyJokeId], lang='en', tld='co.in')
+        tts = gTTS("Good night roast... ", lang='en', tld='co.in')
         tts.save(mp3filename)
 
         vc.play(discord.FFmpegPCMAudio(source=mp3filename))

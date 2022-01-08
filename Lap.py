@@ -1,23 +1,23 @@
-# Lap.py
+# TakeALap.py
+# executable="C:/ffmpeg/bin/ffmpeg.exe", <-- for winows machines..
 import os
 
 import math
 import random
-import asyncio
+from dotenv import load_dotenv
+from typing import Optional
 import discord
 from discord.ext import tasks
-from datetime import date, datetime
-from dotenv import load_dotenv
+from discord.ext.commands import Bot
+from datetime import datetime
 
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
 GUILD = os.getenv('DISCORD_GUILD')
 PIPEDOWN = os.getenv('DISCORD_PIPE_DOWN_ID')
 
-intents = discord.Intents.default()
-intents.members = True
-client = discord.Client(intents=intents)
-
+targetMember = None
+acussingMember = None
 voteIds = []
 voteActive = False
 voteChannelId = ''
@@ -28,20 +28,19 @@ muteActive = False
 muteTime = 0
 muteStartTime = datetime.now()
 
+bot = Bot("!")
+
 @tasks.loop(seconds = 1) # repeat after every 1 seconds
 async def countdownLoop():
     global voteIds, voteActive, voteStartTime, voteChannelId, voteUserId, muteActive, muteStartTime, muteTime
     
-    await client.wait_until_ready()
+    await bot.wait_until_ready()
     
-    for guild in client.guilds:
+    for guild in bot.guilds:
         if guild.name == GUILD:
             break
 
-    pipedown = await guild.query_members(user_ids=[PIPEDOWN])
-    pipedown = pipedown[0]
-
-    channel = client.get_channel(id=voteChannelId)
+    channel = bot.get_channel(id=voteChannelId)
         
     timeDelta = (datetime.now() - voteStartTime)
     timeDelta = math.floor(timeDelta.total_seconds())
@@ -54,50 +53,57 @@ async def countdownLoop():
         elif timeDelta == 62:
             voteActive = False
             voteIds = []
-            await channel.send(f'Votes now closed. Better luck next time fuck nugget !')
+            await channel.send(f'Votes now closed. Better luck next time fuck nugget {acussingMember.mention}!')
 
     muteTimeDelta = (datetime.now() - muteStartTime)
     muteTimeDelta = math.floor(muteTimeDelta.total_seconds())
 
     if muteActive:
         if muteTimeDelta == muteTime:
-            await channel.send(f'The {muteTime} second mute has been lifted! {pipedown.mention}')
+            await channel.send(f'The {muteTime} second mute has been lifted! {targetMember.mention}')
             muteActive = False
             muteTime = 0
-            await set_to_unmuted(pipedown)
+            await set_to_unmuted(targetMember)
 
-@client.event
-async def on_message(message):
-    global voteIds, voteActive, voteChannelId, voteStartTime, muteStartTime, muteTime, muteActive
-    global PIPEDOWN
-    pipedown = await message.guild.query_members(user_ids=[PIPEDOWN])
-    pipedown = pipedown[0]
+
+@bot.command()
+async def lap(ctx, target : Optional[discord.Member] = None):
+    global voteIds, voteActive, voteChannelId, voteStartTime, muteStartTime, muteTime, muteActive, targetMember, acussingMember
     
-    if message.author == client.user:
-        return
-
-    if message.content == '!lap':
-        if message.author.id in voteIds:
-            response = f'You can\'t vote twice fuck face! Yes.. I am talking to you {message.author.mention}'
+    if not muteActive:
+        if not voteActive:
+            if not target:    
+                global PIPEDOWN
+                pipedown = await ctx.guild.query_members(user_ids=[PIPEDOWN])
+                target = pipedown[0]
+            targetMember = target
+            acussingMember = ctx.author
         else:
-            voteIds.insert(len(voteIds), message.author.id)
+            target = targetMember
+
+        if ctx.author.id in voteIds:
+            response = f'You can\'t vote twice fuck face! Yes.. I am talking to you {ctx.author.mention}'
+        else:
+            voteIds.insert(len(voteIds), ctx.author.id)
 
             if len(voteIds) == 1:
-                response = f'{message.author.mention} has intiated a vote to mute {pipedown.mention}! "!lap" to vote ({len(voteIds)} / 5)'
+                response = f'{ctx.author.mention} has intiated a vote to mute {target.mention}! "!lap" to vote ({len(voteIds)} / 5)'
                 voteActive = True
                 voteStartTime = datetime.now()
-                voteChannelId = message.channel.id 
-            elif len(voteIds) == 5:
-                muteTime = random.randint(15, 60)
+                voteChannelId = ctx.channel.id 
+            elif len(voteIds) == 2:
+                muteTime = random.randint(15, 120)
                 muteStartTime = datetime.now()
                 muteActive = True
-                response = f'{message.author.mention} put the final nail in the coffin! ({len(voteIds)} / 5)\n{pipedown.mention} will be muted for {muteTime} seconds!'
+                response = f'{ctx.author.mention} put the final nail in the coffin! ({len(voteIds)} / 5)\n{target.mention} will be muted for {muteTime} seconds!'
                 voteIds = []
                 voteActive = False
-                await set_to_muted(pipedown)
+                await set_to_muted(target)
             else:
-                response = f'{message.author.mention} has spoken! ({len(voteIds)} / 5)'
-        await message.channel.send(response)
+                response = f'{ctx.author.mention} has spoken! ({len(voteIds)} / 5)'
+        await ctx.send(response)
+    else:
+        await ctx.send(f"I am currently muting {targetMember.mention}.. like tf chill out and get the fuck outta my face {ctx.author.mention} dumb ass bitch!")
 
 async def set_to_muted(member: discord.Member):
     await member.edit(mute=True)
@@ -105,5 +111,5 @@ async def set_to_muted(member: discord.Member):
 async def set_to_unmuted(member: discord.Member):
     await member.edit(mute=False)
 
-countdownLoop.start()     
-client.run(TOKEN)
+countdownLoop.start()  
+bot.run(TOKEN)
