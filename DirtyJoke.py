@@ -147,18 +147,44 @@ async def testTTS(ctx):
 			
 		engine.runAndWait()
 
+#@bot.command(pass_context = True)
+#async def moan(ctx):
+#	if (ctx.author.voice):
+#		channel = ctx.author.voice.channel
+#		vc = await channel.connect()
+#		vc.play(discord.FFmpegPCMAudio(source="TTS_Files/Moan.mp3"))
+#		
+#		while vc.is_playing():
+#			print("playing...")
+#			 
+#		await asyncio.sleep(2)
+#		await ctx.guild.voice_client.disconnect()
+
 @bot.command(pass_context = True)
-async def moan(ctx):
+async def gofuckyourself(ctx):
 	if (ctx.author.voice):
 		channel = ctx.author.voice.channel
 		vc = await channel.connect()
-		vc.play(discord.FFmpegPCMAudio(source="TTS_Files/Moan.mp3"))
+		vc.play(discord.FFmpegPCMAudio(source="TTS_Files/GoFuckYourselfOlly.mp3"))
 		
 		while vc.is_playing():
 			print("playing...")
 			 
 		await asyncio.sleep(2)
 		await ctx.guild.voice_client.disconnect()
+
+#@bot.command(pass_context = True)
+#async def merkal(ctx):
+#	if (ctx.author.voice):
+#		channel = ctx.author.voice.channel
+#		vc = await channel.connect()
+#		vc.play(discord.FFmpegPCMAudio(source="TTS_Files/Merkal.mp3"))
+#		
+#		while vc.is_playing():
+#			print("playing...")
+#			 
+#		await asyncio.sleep(2)
+#		await ctx.guild.voice_client.disconnect()
 
 @bot.command(pass_context = True)
 async def ofcourse(ctx):
@@ -231,7 +257,7 @@ async def dirtyjoke(ctx):
         #engine. setProperty("rate", 140)
         #engine.save_to_file(jokeList[dirtyJokeId], mp3filename)
         #engine.runAndWait()
-        tts = gTTS("Good night roast... ", lang='en', tld='co.in')
+        tts = gTTS(jokeList[dirtyJokeId], lang='en', tld='co.in')
         tts.save(mp3filename)
 
         vc.play(discord.FFmpegPCMAudio(source=mp3filename))
